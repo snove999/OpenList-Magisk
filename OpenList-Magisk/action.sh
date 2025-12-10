@@ -1,6 +1,7 @@
 #!/system/bin/sh
 # shellcheck shell=ash
 # action.sh for OpenList Magisk Module (All-in-One)
+# 支持 Magisk / KernelSU / APatch
 
 MODDIR="${0%/*}"
 MODULE_PROP="$MODDIR/module.prop"
@@ -10,9 +11,30 @@ OPENLIST_BINARY="__PLACEHOLDER_BINARY_PATH__"
 DATA_DIR="__PLACEHOLDER_DATA_DIR__"
 REPO_URL="https://github.com/snove999/OpenList-Magisk"
 
+#==== 框架检测：Magisk / KernelSU / APatch ====
+detect_framework() {
+    if [ -n "$APATCH" ] || [ -n "$APATCH_VER" ]; then
+        FRAMEWORK="APatch"
+    elif [ -n "$KSU" ] || [ -n "$KERNELSU" ]; then
+        FRAMEWORK="KernelSU"
+    elif [ -n "$MAGISK_VER" ]; then
+        FRAMEWORK="Magisk"
+    else
+        if [ -d "/data/adb/ap" ]; then
+            FRAMEWORK="APatch"
+        elif [ -d "/data/adb/ksu" ]; then
+            FRAMEWORK="KernelSU"
+        else
+            FRAMEWORK="Magisk"
+        fi
+    fi
+}
+detect_framework
+#==== 框架检测结束 ====
+
 # 查找 BusyBox
 find_busybox() {
-    local paths="/data/adb/magisk/busybox /data/adb/ksu/bin/busybox /system/xbin/busybox /system/bin/busybox"
+    local paths="/data/adb/magisk/busybox /data/adb/ksu/bin/busybox /data/adb/ap/bin/busybox /system/xbin/busybox /system/bin/busybox"
     for path in $paths; do
         [ -x "$path" ] && echo "$path" && return 0
     done
@@ -24,10 +46,10 @@ BUSYBOX=$(find_busybox)
 
 # 获取服务状态
 get_service_status() {
-    local name="$1"
-    local pattern="$2"
+    local pattern="$1"
     if pgrep -f "$pattern" >/dev/null 2>&1; then
-        echo "运行中"
+        local pid=$(pgrep -f "$pattern" | head -n1)
+        echo "运行中 (PID: $pid)"
         return 0
     else
         echo "已停止"
@@ -37,7 +59,7 @@ get_service_status() {
 
 # 检查是否有任何服务在运行
 any_service_running() {
-    pgrep -f "openlist" >/dev/null 2>&1 && return 0
+    pgrep -f "openlist server" >/dev/null 2>&1 && return 0
     pgrep -f "aria2c" >/dev/null 2>&1 && return 0
     pgrep -f "qbittorrent-nox" >/dev/null 2>&1 && return 0
     pgrep -f "frpc" >/dev/null 2>&1 && return 0
@@ -61,6 +83,7 @@ stop_all_services() {
     # 强制终止
     for svc in $services; do
         if pgrep -f "$svc" >/dev/null 2>&1; then
+            echo "  强制终止 $svc..."
             pkill -9 -f "$svc"
         fi
     done
@@ -82,22 +105,19 @@ update_module_prop_stopped() {
 show_status() {
     echo ""
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━"
-    echo "📊 服务状态"
+    echo "📊 服务状态 [$FRAMEWORK]"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━"
     
-    local ol_status=$(get_service_status "OpenList" "openlist")
-    local aria2_status=$(get_service_status "Aria2" "aria2c")
-    local qb_status=$(get_service_status "Qbittorrent" "qbittorrent-nox")
-    local frpc_status=$(get_service_status "Frpc" "frpc")
-    
-    echo "OpenList:     $ol_status"
-    echo "Aria2:        $aria2_status"
-    echo "Qbittorrent:  $qb_status"
-    echo "Frpc:         $frpc_status"
+    echo "OpenList:     $(get_service_status 'openlist server')"
+    echo "Aria2:        $(get_service_status 'aria2c')"
+    echo "Qbittorrent:  $(get_service_status 'qbittorrent-nox')"
+    echo "Frpc:         $(get_service_status 'frpc')"
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━"
 }
 
 # ============== 主逻辑 ==============
+
+echo "框架: $FRAMEWORK"
 
 if any_service_running; then
     # 有服务在运行，执行停止

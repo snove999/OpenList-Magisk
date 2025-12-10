@@ -1,11 +1,9 @@
-## 🤖 Assistant
-
-# OpenList All-in-One Magisk/KernelSU 模块
+# OpenList All-in-One Magisk/KernelSU/APatch 模块
 
 [![Release](https://img.shields.io/github/v/release/snove999/OpenList-Magisk)](https://github.com/snove999/OpenList-Magisk/releases)
 [![License](https://img.shields.io/github/license/snove999/OpenList-Magisk)](https://github.com/snove999/OpenList-Magisk/blob/main/LICENSE)
 
-OpenList All-in-One 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) 文件服务器及多款实用工具集成到 Android 系统中，通过 Magisk 或 KernelSU 以系统化方式运行，支持 ARM 和 ARM64 架构。
+OpenList All-in-One 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) 文件服务器及多款实用工具集成到 Android 系统中，通过 **Magisk**、**KernelSU** 或 **APatch** 以系统化方式运行，支持 ARM 和 ARM64 架构。
 
 ## ✨ 包含组件
 
@@ -19,41 +17,49 @@ OpenList All-in-One 模块将 [OpenList](https://github.com/OpenListTeam/OpenLis
 | **AriaNg** | Aria2 Web 管理界面 | - |
 | **VueTorrent** | Qbittorrent 现代化 WebUI | - |
 
-## 功能亮点
+## 🚀 功能亮点
 
+- **📱 三框架支持**：同时兼容 Magisk、KernelSU 和 APatch
 - **🔧 模块化服务管理**：通过配置文件灵活启用/禁用各服务
 - **📦 一键安装**：自动下载并配置所有组件
+- **🔄 数据迁移**：升级安装时自动检测并迁移旧数据目录
 - **🎨 现代化 WebUI**：Qbittorrent 默认使用 VueTorrent 界面
 - **🔐 安全配置**：Aria2 RPC 默认启用密钥认证
-- **📱 双框架支持**：同时兼容 Magisk 和 KernelSU
 - **🌐 智能网络适配**：自动识别 WiFi/移动网络 IP
-- **📊 状态监控**：模块描述实时显示各服务运行状态
+- **📊 状态监控**：模块描述实时显示各服务运行状态及 PID
 
-## 系统要求
+## 📋 系统要求
 
 - Android 设备（ARM64 架构，部分组件仅支持 ARM64）
-- Magisk v20.4+ 或 KernelSU
+- **Root 框架**（任选其一）：
+  - Magisk v20.4+
+  - KernelSU
+  - APatch
 - Root 权限
 - 约 150MB 存储空间
 
-## 安装步骤
+## 📥 安装步骤
 
 ### 1. 下载模块
 从 [GitHub Releases](https://github.com/snove999/OpenList-Magisk/releases) 下载最新版本 `openlist-magisk-vX.X.X.zip`
 
 ### 2. 安装配置
-1. 打开 Magisk/KernelSU 管理器
+1. 打开 Magisk/KernelSU/APatch 管理器
 2. 选择「从本地安装」
 3. 按提示配置：
- - **二进制安装位置**：推荐选择 `/data/adb/openlist/bin`
- - **数据目录**：推荐选择 `/data/adb/openlist`
- - **初始密码**：可选设置为 `admin`
+   - **二进制安装位置**：推荐选择 `/data/adb/openlist/bin`
+   - **数据目录**：推荐选择 `/data/adb/openlist`
+   - **初始密码**：可选设置为 `admin`
+4. **数据迁移**（升级安装时）：
+   - 自动检测旧数据目录
+   - 选择是否迁移到新目录
+   - 可选删除旧目录
 
 ### 3. 完成安装
 - 等待安装完成后重启设备
 - 首次启动会自动生成默认配置文件
 
-## 使用说明
+## 📖 使用说明
 
 ### 服务控制
 
@@ -61,13 +67,13 @@ OpenList All-in-One 模块将 [OpenList](https://github.com/OpenListTeam/OpenLis
 
 ```bash
 # 设置为 true 启用，false 禁用
-openlist=true      # OpenList 文件服务器
-aria2=false        # Aria2 下载器
-qbittorrent=false  # Qbittorrent BT客户端
-frpc=false         # Frpc 内网穿透
+openlist=true # OpenList 文件服务器
+aria2=false # Aria2 下载器
+qbittorrent=false # Qbittorrent BT客户端
+frpc=false # Frpc 内网穿透
 ```
 
-修改后重启设备或通过 Magisk「动作」按钮重启服务生效。
+修改后重启设备或通过管理器「动作」按钮重启服务生效。
 
 ### 访问地址
 
@@ -77,7 +83,7 @@ frpc=false         # Frpc 内网穿透
 | Aria2 (AriaNg) | `http://<IP>:5244/ariang` | RPC密钥: `openlist` |
 | Qbittorrent | `http://<IP>:8080` | admin / adminadmin |
 
-> **提示**：设备 IP 地址显示在 Magisk 模块描述中
+> **提示**：设备 IP 地址显示在模块管理器的模块描述中
 
 ### 配置文件说明
 
@@ -94,19 +100,19 @@ frpc=false         # Frpc 内网穿透
 ```
 <数据目录>/
 ├── config/
-│   ├── services.conf    # 服务开关
-│   ├── aria2.conf       # Aria2 配置
-│   └── frpc.toml        # Frpc 配置
-├── downloads/           # 统一下载目录
+│ ├── services.conf # 服务开关
+│ ├── aria2.conf # Aria2 配置
+│ └── frpc.toml # Frpc 配置
+├── downloads/ # 统一下载目录
 ├── aria2/
-│   ├── aria2.session    # Aria2 会话
-│   └── aria2.log        # Aria2 日志
-├── qbittorrent/         # Qbittorrent 数据
-├── openlist.log         # OpenList 日志
-└── 初始密码.txt          # OpenList 初始密码
+│ ├── aria2.session # Aria2 会话
+│ └── aria2.log # Aria2 日志
+├── qbittorrent/ # Qbittorrent 数据
+├── openlist.log # OpenList 日志
+└── 初始密码.txt # OpenList 初始密码
 ```
 
-## 高级配置
+## ⚙️ 高级配置
 
 ### Aria2 配置
 默认配置文件 `aria2.conf` 已优化，关键参数：
@@ -122,7 +128,7 @@ frpc=false         # Frpc 内网穿透
 ### Frpc 内网穿透
 1. 编辑 `<数据目录>/config/frpc.toml`
 2. 填写你的 Frp 服务器信息：
-```toml
+   ```toml
    serverAddr = "your.frp.server.com"
    serverPort = 7000
    auth.token = "your_token"
@@ -140,7 +146,7 @@ Rclone 不作为服务运行，可通过命令行或 OpenList 调用：
 <数据目录>/config/rclone.conf
 ```
 
-## 故障排除
+## 🔧 故障排除
 
 ### 查看日志
 ```bash
@@ -175,6 +181,10 @@ cat <数据目录>/aria2/aria2.log
 - 检查 `frpc.toml` 语法是否正确
 - 查看 `<数据目录>/frpc.log`
 
+**Q: APatch 框架安装问题**
+- 确认使用最新版 APatch
+- 建议将二进制安装到 `/data/adb/openlist/bin`
+
 ### 手动操作
 ```bash
 # 查看运行中的服务
@@ -187,24 +197,36 @@ pkill -f openlist; pkill -f aria2c; pkill -f qbittorrent-nox; pkill -f frpc
 sh /data/adb/modules/openlist/service.sh
 ```
 
-## 更新说明
+## 🔄 更新与迁移
 
-- 更新时会保留现有配置和数据
-- 新版本可能包含新的默认配置项，建议检查 `services.conf`
-- 通过 Magisk 更新检查获取最新版本
+### 升级安装
+- 更新时会自动检测旧数据目录
+- 支持自动迁移数据到新目录
+- 配置文件路径会自动更新
 
-## 卸载说明
+### 数据迁移说明
+1. 安装时选择新的数据目录
+2. 系统自动检测并提示迁移
+3. 迁移内容包括：数据库、配置、下载文件
+4. 迁移后可选删除旧目录
 
-### 通过 Magisk 卸载
-- 完全卸载：自动停止服务并清理所有数据
-- 使用 `uninstall-user.sh` 可选择保留下载文件
+## 🗑️ 卸载说明
 
-### 数据保留
+### 通过管理器卸载
+- **标准卸载** (`uninstall.sh`)：自动停止服务并清理所有数据
+- **交互式卸载** (`uninstall-user.sh`)：可选择保留数据
+
+### 卸载选项
+1. **保留所有数据**：配置、下载、数据库全部保留
+2. **仅删除配置**：保留下载文件和数据库
+3. **删除所有数据**：彻底清理
+
+### 数据保留位置
 卸载后以下目录可能保留（取决于选择）：
-- `/data/adb/openlist/downloads/`
-- `/sdcard/Android/openlist/downloads/`
+- `/data/adb/openlist/`
+- `/sdcard/Android/openlist/`
 
-## 致谢
+## 🙏 致谢
 
 - [OpenList](https://github.com/OpenListTeam/OpenList) - 核心文件服务器
 - [Aria2](https://github.com/aria2/aria2) - 下载引擎
@@ -214,11 +236,11 @@ sh /data/adb/modules/openlist/service.sh
 - [AriaNg](https://github.com/mayswind/AriaNg) - Aria2 WebUI
 - [VueTorrent](https://github.com/VueTorrent/VueTorrent) - qBittorrent WebUI
 
-## 贡献
+## 🤝 贡献
 
 - 欢迎提交 Issue 和 Pull Request
 - 问题反馈：[GitHub Issues](https://github.com/snove999/OpenList-Magisk/issues)
 
-## 许可证
+## 📄 许可证
 
 本项目基于 [MIT 许可证](LICENSE) 发布。

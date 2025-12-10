@@ -1,27 +1,41 @@
 # shellcheck shell=ash
 # customize.sh for OpenList Magisk Module (All-in-One)
+# 支持 Magisk / KernelSU / APatch
 
-#==== 侦探：Magisk or KernelSU ====
-if [ -n "$MAGISK_VER" ]; then
-    MODROOT="$MODPATH"
-elif [ -n "$KSU" ] || [ -n "$KERNELSU" ]; then
-    MODROOT="$MODULEROOT"
-else
-    MODROOT="$MODPATH"
-fi
-#==== 侦探结束 ====
+#==== 框架检测：Magisk / KernelSU / APatch ====
+detect_framework() {
+    if [ -n "$APATCH" ] || [ -n "$APATCH_VER" ]; then
+        FRAMEWORK="APatch"
+        MODROOT="$MODPATH"
+    elif [ -n "$KSU" ] || [ -n "$KERNELSU" ]; then
+        FRAMEWORK="KernelSU"
+        MODROOT="$MODULEROOT"
+    elif [ -n "$MAGISK_VER" ]; then
+        FRAMEWORK="Magisk"
+        MODROOT="$MODPATH"
+    else
+        FRAMEWORK="Unknown"
+        MODROOT="$MODPATH"
+    fi
+}
+detect_framework
+#==== 框架检测结束 ====
 
 ui_print ""
 ui_print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 ui_print "  OpenList All-in-One 模块安装"
 ui_print "  包含: Aria2 | Qbittorrent | Frpc | Rclone"
 ui_print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+ui_print "📱 检测到框架: $FRAMEWORK"
 
 # 检测架构
 ARCH=$(getprop ro.product.cpu.abi)
 ui_print "📱 设备架构: $ARCH"
 
 BINARY_NAME="openlist"
+
+# 定义可能的旧数据目录
+OLD_DATA_DIRS="/data/adb/openlist /sdcard/Android/openlist"
 
 # 按键检测函数
 until_key() {
@@ -34,6 +48,17 @@ until_key() {
             KEY_POWER) echo -n power; return ;;
         esac
     done
+}
+
+# 检测是否有旧数据
+detect_old_data() {
+    for dir in $OLD_DATA_DIRS; do
+        if [ -d "$dir" ] && [ -d "$dir/data" -o -f "$dir/data.db" -o -d "$dir/config" ]; then
+            echo "$dir"
+            return 0
+        fi
+    done
+    return 1
 }
 
 # 菜单显示函数
@@ -68,16 +93,30 @@ show_password_menu() {
     ui_print "👉 当前选择：选项 $1"
 }
 
+show_migrate_menu() {
+    ui_print " "
+    ui_print "📦 检测到旧数据目录: $1"
+    ui_print "是否迁移到新目录: $2"
+    ui_print "1、迁移数据（推荐）"
+    ui_print "2、不迁移（全新安装）"
+    ui_print "━━━━━━━━━━━━━━━━━━━━━━"
+    ui_print "音量+ 确认  |  音量- 切换"
+    ui_print "👉 当前选择：选项 $3"
+}
+
 # 选择函数
 make_selection() {
     local menu_type="$1"
     local max_options="$2"
+    local extra_arg1="$3"
+    local extra_arg2="$4"
     local current=1
     
     case "$menu_type" in
         "binary") show_binary_menu "$current" ;;
         "data") show_data_menu "$current" ;;
         "password") show_password_menu "$current" ;;
+        "migrate") show_migrate_menu "$extra_arg1" "$extra_arg2" "$current" ;;
     esac
     
     while true; do
@@ -94,6 +133,89 @@ make_selection() {
         esac
         sleep 0.3
     done
+}
+
+# 数据迁移函数
+migrate_data() {
+    local old_dir="$1"
+    local new_dir="$2"
+    
+    ui_print "🔄 开始迁移数据..."
+    ui_print "   源目录: $old_dir"
+    ui_print "   目标: $new_dir"
+    
+    # 创建新目录
+    mkdir -p "$new_dir"
+    
+    # 迁移核心数据文件
+    local items_to_migrate="data data.db config downloads aria2 qbittorrent 初始密码.txt"
+    local migrated=0
+    
+    for item in $items_to_migrate; do
+        if [ -e "$old_dir/$item" ]; then
+            ui_print "   迁移: $item"
+            cp -af "$old_dir/$item" "$new_dir/" 2>/dev/null
+            if [ $? -eq 0 ]; then
+                migrated=$((migrated + 1))
+            else
+                ui_print "   ⚠️ 迁移 $item 失败"
+            fi
+        fi
+    done
+    
+    if [ $migrated -gt 0 ]; then
+        ui_print "✅ 成功迁移 $migrated 个项目"
+        
+        # 更新配置文件中的路径（如果存在 config.json）
+        if [ -f "$new_dir/data/config.json" ]; then
+            ui_print "🔧 更新配置文件路径..."
+            sed -i "s|$old_dir|$new_dir|g" "$new_dir/data/config.json" 2>/dev/null
+        fi
+        
+        # 更新 aria2.conf 中的路径
+        if [ -f "$new_dir/config/aria2.conf" ]; then
+            ui_print "🔧 更新 Aria2 配置路径..."
+            sed -i "s|$old_dir|$new_dir|g" "$new_dir/config/aria2.conf" 2>/dev/null
+        fi
+        
+        # 询问是否删除旧目录
+        ui_print " "
+        ui_print "❓ 是否删除旧数据目录?"
+        ui_print "1、保留旧目录（安全）"
+        ui_print "2、删除旧目录（节省空间）"
+        ui_print "━━━━━━━━━━━━━━━━━━━━━━"
+        ui_print "音量+ 确认  |  音量- 切换"
+        ui_print "👉 当前选择：选项 1"
+        
+        local del_choice=1
+        while true; do
+            case "$(until_key)" in
+                "up")
+                    ui_print "✅ 已确认选项 $del_choice"
+                    break
+                    ;;
+                "down")
+                    del_choice=$((del_choice + 1))
+                    [ $del_choice -gt 2 ] && del_choice=1
+                    ui_print "👉 当前选择：选项 $del_choice"
+                    ;;
+            esac
+            sleep 0.3
+        done
+        
+        if [ "$del_choice" = "2" ]; then
+            ui_print "🗑️ 删除旧目录: $old_dir"
+            rm -rf "$old_dir"
+            ui_print "✅ 旧目录已删除"
+        else
+            ui_print "📁 旧目录已保留: $old_dir"
+        fi
+        
+        return 0
+    else
+        ui_print "⚠️ 未找到需要迁移的数据"
+        return 1
+    fi
 }
 
 # ============== 安装流程 ==============
@@ -162,6 +284,32 @@ case $DATA_DIR_OPTION in
     2) DATA_DIR="/sdcard/Android/openlist" ;;
 esac
 
+# ============== 数据迁移检测 ==============
+
+OLD_DATA_DIR=$(detect_old_data)
+
+if [ -n "$OLD_DATA_DIR" ] && [ "$OLD_DATA_DIR" != "$DATA_DIR" ]; then
+    ui_print ""
+    ui_print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    ui_print "📦 检测到现有数据"
+    ui_print "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    
+    make_selection "migrate" "2" "$OLD_DATA_DIR" "$DATA_DIR"
+    MIGRATE_OPTION=$?
+    
+    if [ "$MIGRATE_OPTION" = "1" ]; then
+        migrate_data "$OLD_DATA_DIR" "$DATA_DIR"
+    else
+        ui_print "✓ 跳过数据迁移，将进行全新安装"
+    fi
+elif [ -n "$OLD_DATA_DIR" ] && [ "$OLD_DATA_DIR" = "$DATA_DIR" ]; then
+    ui_print ""
+    ui_print "📁 检测到现有数据目录: $DATA_DIR"
+    ui_print "✓ 将保留现有数据进行升级安装"
+fi
+
+# ============== 更新配置文件 ==============
+
 ui_print " "
 ui_print "📢 配置信息"
 ui_print "━━━━━━━━━━━━━━━━━━━━━━"
@@ -192,28 +340,32 @@ else
     abort "❌ 未找到 service.sh 或 action.sh"
 fi
 
-# 密码设置
-make_selection "password" "2"
-PASSWORD_OPTION=$?
+# 密码设置（仅在非升级安装时询问）
+if [ ! -f "$DATA_DIR/data.db" ] && [ ! -d "$DATA_DIR/data" ]; then
+    make_selection "password" "2"
+    PASSWORD_OPTION=$?
 
-if [ "$PASSWORD_OPTION" = "2" ]; then
-    ui_print "🔄 设置初始密码..."
-    
-    case $INSTALL_OPTION in
-        1) "$BINARY_PATH/openlist" admin set admin --data "$DATA_DIR" ;;
-        2) "$MODROOT/bin/openlist" admin set admin --data "$DATA_DIR" ;;
-        3) "$MODROOT/system/bin/openlist" admin set admin --data "$DATA_DIR" ;;
-    esac
-    
-    if [ $? -eq 0 ]; then
-        mkdir -p "$DATA_DIR"
-        echo "admin" > "$DATA_DIR/初始密码.txt"
-        ui_print "✅ 密码已设为: admin"
+    if [ "$PASSWORD_OPTION" = "2" ]; then
+        ui_print "🔄 设置初始密码..."
+        
+        case $INSTALL_OPTION in
+            1) "$BINARY_PATH/openlist" admin set admin --data "$DATA_DIR" ;;
+            2) "$MODROOT/bin/openlist" admin set admin --data "$DATA_DIR" ;;
+            3) "$MODROOT/system/bin/openlist" admin set admin --data "$DATA_DIR" ;;
+        esac
+        
+        if [ $? -eq 0 ]; then
+            mkdir -p "$DATA_DIR"
+            echo "admin" > "$DATA_DIR/初始密码.txt"
+            ui_print "✅ 密码已设为: admin"
+        else
+            ui_print "⚠️ 密码设置失败，将使用随机密码"
+        fi
     else
-        ui_print "⚠️ 密码设置失败，将使用随机密码"
+        ui_print "✓ 跳过密码设置"
     fi
 else
-    ui_print "✓ 跳过密码设置"
+    ui_print "📁 检测到现有数据库，跳过密码设置"
 fi
 
 # 完成
