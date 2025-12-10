@@ -81,10 +81,10 @@ jobs:
         run: |
           echo "::group::获取 Aria2 版本信息"
           RELEASE_JSON=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN" \
-            "https://api.github.com/repos/q3aql/aria2-static-builds/releases/latest")
+            "https://api.github.com/repos/P3TERX/Aria2-Pro-Core/releases/latest")
           
           ARIA2_VERSION=$(echo "$RELEASE_JSON" | jq -r '.tag_name // "unknown"')
-          ARIA2_URL=$(echo "$RELEASE_JSON" | jq -r '.assets[] | select(.name | contains("android-arm64")) | .browser_download_url')
+          ARIA2_URL=$(echo "$RELEASE_JSON" | jq -r '.assets[] | select(.name | contains("linux_arm64.tar.gz")) | .browser_download_url')
           
           echo "Aria2 版本: $ARIA2_VERSION"
           echo "ARIA2_VERSION=$ARIA2_VERSION" >> $GITHUB_ENV
