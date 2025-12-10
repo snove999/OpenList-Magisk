@@ -465,7 +465,7 @@ jobs:
         if: env.SHOULD_BUILD == 'true'
         run: |
           BUILD_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
-          cat > release_notes.md << 'EOF'
+          cat > release_notes.md << EOF
           ## 📦 OpenList All-in-One Magisk Module
           
           **支持框架**: Magisk / KernelSU / APatch
