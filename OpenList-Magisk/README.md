@@ -139,10 +139,10 @@ frpc=false # Frpc 内网穿透
 ### Rclone 使用
 Rclone 不作为服务运行，可通过命令行或 OpenList 调用：
 ```bash
-# 二进制位置
+二进制位置
 /data/adb/modules/<模块ID>/bin/rclone
 
-# 配置文件（需手动创建）
+配置文件（需手动创建）
 <数据目录>/config/rclone.conf
 ```
 
@@ -150,13 +150,13 @@ Rclone 不作为服务运行，可通过命令行或 OpenList 调用：
 
 ### 查看日志
 ```bash
-# 模块主日志
+模块主日志
 cat /data/adb/modules/openlist/service.log
 
-# OpenList 日志
+OpenList 日志
 cat <数据目录>/openlist.log
 
-# Aria2 日志
+Aria2 日志
 cat <数据目录>/aria2/aria2.log
 ```
 
