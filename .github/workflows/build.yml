@@ -464,6 +464,7 @@ jobs:
       - name: 生成 Release Notes
         if: env.SHOULD_BUILD == 'true'
         run: |
+          BUILD_TIME=$(date -u +"%Y-%m-%d %H:%M:%S")
           cat > release_notes.md << 'EOF'
           ## 📦 OpenList All-in-One Magisk Module
           
@@ -495,7 +496,7 @@ jobs:
           - Qbittorrent: `8080` (admin/adminadmin)
           
           ---
-          > 自动构建于 $(date -u +%Y-%m-%d\ %H:%M:%S) UTC
+          > 自动构建于 ${BUILD_TIME} UTC
           EOF
 
       - name: 检查是否存在相同 Tag
