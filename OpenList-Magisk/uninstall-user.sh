@@ -1,5 +1,6 @@
 # shellcheck shell=ash
-# uninstall.sh for OpenList Magisk/KSU Module
+# uninstall-user.sh for OpenList Magisk/KSU Module (All-in-One)
+# 交互式卸载，允许用户选择是否保留数据
 
 #==== 侦探：Magisk or KernelSU ====
 if [ -n "$MAGISK_VER" ]; then
@@ -7,96 +8,115 @@ if [ -n "$MAGISK_VER" ]; then
 elif [ -n "$KSU" ] || [ -n "$KERNELSU" ]; then
     MODROOT="$MODULEROOT"
 else
-    MODROOT="$MODPATH"  # 兜底，保持旧逻辑
+    MODROOT="$MODPATH"
 fi
 #==== 侦探结束 ====
 
-# 日志函数
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $1"
 }
 
-# 停止服务函数
-stop_service() {
-    if pgrep -f openlist >/dev/null; then
-        log "正在停止 OpenList 服务..."
-        pkill -f openlist
-        sleep 1
-        if pgrep -f openlist >/dev/null; then
-            log "警告：无法完全停止 OpenList 服务"
-            return 1
-        else
-            log "OpenList 服务已停止"
-            return 0
+# 停止所有服务
+stop_all_services() {
+    log "正在停止所有服务..."
+    
+    local services="openlist aria2c qbittorrent-nox frpc"
+    for svc in $services; do
+        if pgrep -f "$svc" >/dev/null 2>&1; then
+            log "停止 $svc..."
+            pkill -f "$svc"
         fi
-    else
-        log "OpenList 服务未运行"
-        return 0
-    fi
+    done
+    
+    sleep 2
+    
+    # 强制终止残留进程
+    for svc in $services; do
+        if pgrep -f "$svc" >/dev/null 2>&1; then
+            log "强制终止 $svc..."
+            pkill -9 -f "$svc"
+        fi
+    done
+    
+    log "所有服务已停止"
 }
 
 # 清理二进制文件
 clean_binaries() {
-    local found=0
-    local paths="/data/adb/openlist/bin/openlist $MODROOT/bin/openlist $MODROOT/system/bin/openlist"
+    log "清理二进制文件..."
     
-    for path in $paths; do
-        if [ -f "$path" ]; then
-            log "正在删除二进制文件：$path"
-            rm -f "$path"
-            found=1
-        fi
+    local openlist_paths="/data/adb/openlist/bin/openlist $MODROOT/bin/openlist $MODROOT/system/bin/openlist"
+    for path in $openlist_paths; do
+        [ -f "$path" ] && rm -f "$path" && log "已删除: $path"
     done
     
-    if [ $found -eq 0 ]; then
-        log "未找到 OpenList 二进制文件"
-    fi
+    [ -d "$MODROOT/bin" ] && rm -rf "$MODROOT/bin" && log "已删除: $MODROOT/bin"
+    [ -d "$MODROOT/web" ] && rm -rf "$MODROOT/web" && log "已删除: $MODROOT/web"
+    
+    log "二进制文件清理完成"
 }
 
-# 清理数据目录
+# 交互式数据清理
 clean_data() {
-    echo "数据清理选项："
-    echo "1. 保留数据"
-    echo "2. 删除所有数据"
-    echo "请选择（输入数字）："
+    echo ""
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "📁 数据清理选项"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo "1. 保留所有数据（配置、下载等）"
+    echo "2. 仅删除配置，保留下载文件"
+    echo "3. 删除所有数据"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo -n "请选择 [1-3]: "
     read -r choice
 
     case "$choice" in
         1)
-            log "已选择保留数据"
+            log "已选择：保留所有数据"
             ;;
         2)
-            log "开始清理数据目录..."
+            log "已选择：仅删除配置文件"
+            for dir in "/data/adb/openlist" "/sdcard/Android/openlist"; do
+                if [ -d "$dir/config" ]; then
+                    log "删除配置目录: $dir/config"
+                    rm -rf "$dir/config"
+                fi
+                # 删除各服务的配置/日志，保留 downloads
+                [ -d "$dir/aria2" ] && rm -rf "$dir/aria2" && log "删除: $dir/aria2"
+                [ -d "$dir/qbittorrent/qBittorrent" ] && rm -rf "$dir/qbittorrent/qBittorrent" && log "删除: $dir/qbittorrent/qBittorrent"
+                [ -f "$dir/openlist.log" ] && rm -f "$dir/openlist.log"
+                [ -f "$dir/frpc.log" ] && rm -f "$dir/frpc.log"
+            done
+            log "配置文件清理完成，下载文件已保留"
+            ;;
+        3)
+            log "已选择：删除所有数据"
             for dir in "/data/adb/openlist" "/sdcard/Android/openlist"; do
                 if [ -d "$dir" ]; then
-                    log "正在删除数据目录：$dir"
+                    log "删除数据目录: $dir"
                     rm -rf "$dir"
                 fi
             done
-            log "数据目录清理完成"
+            log "所有数据清理完成"
             ;;
         *)
-            log "无效选择，默认保留数据"
+            log "无效选择，默认保留所有数据"
             ;;
     esac
 }
 
-# 主要卸载流程
+# 主卸载流程
 main() {
-    log "开始卸载 OpenList Magisk 模块..."
-
-    # 停止服务
-    stop_service
+    log "=========================================="
+    log "OpenList All-in-One 模块卸载向导"
+    log "=========================================="
     
-    # 清理二进制文件
+    stop_all_services
     clean_binaries
-    
-    # 清理数据（用户选择）
     clean_data
     
-    log "卸载完成"
-    echo "请重启设备以完成卸载"
+    log "=========================================="
+    log "卸载完成，请重启设备"
+    log "=========================================="
 }
 
-# 执行主函数
 main
