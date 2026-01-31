@@ -1,14 +1,14 @@
 {
-  "version": "v4.1.9",
-  "versionCode": 40109,
-  "zipUrl": "https://github.com/snove999/OpenList-Magisk/releases/download/v4.1.9/openlist-magisk-v4.1.9.zip",
+  "version": "v4.1.10",
+  "versionCode": 40110,
+  "zipUrl": "https://github.com/snove999/OpenList-Magisk/releases/download/v4.1.10/openlist-magisk-v4.1.10.zip",
   "changelog": "https://github.com/snove999/OpenList-Magisk/raw/main/CHANGELOG.md",
   "aria2_version": "1.36.0_2021.08.22",
   "qbit_version": "release-5.1.4_v2.0.11",
-  "frpc_version": "v0.66.0",
-  "rclone_version": "v1.72.1",
-  "ariang_version": "1.3.12",
+  "frpc_version": "v0.67.0",
+  "rclone_version": "v1.73.0",
+  "ariang_version": "1.3.13",
   "vuetorrent_version": "v2.31.3",
-  "build_date": "2026-01-24T18:23:32Z",
-  "build_reason": "VueTorrent 更新: v2.31.2 → v2.31.3"
+  "build_date": "2026-01-31T18:25:04Z",
+  "build_reason": "OpenList 更新: v4.1.9 → v4.1.10"
 }

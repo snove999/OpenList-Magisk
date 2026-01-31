@@ -1,7 +1,7 @@
 id=openlist
 name=OpenList
-version=v4.1.9 (All-in-One)
-versionCode=40109
+version=v4.1.10 (All-in-One)
+versionCode=40110
 author=snove
 description=【已停止】请点击"操作"启动程序。项目地址：https://github.com/snove999/OpenList-Magisk(感谢Alien-Et的项目)
 updateJson=https://raw.githubusercontent.com/snove999/OpenList-Magisk/main/update.json
