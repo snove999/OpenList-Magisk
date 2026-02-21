@@ -1,13 +1,13 @@
-# OpenList Magisk(兼容KernelSU) 模块
+# OpenList Magisk/KernelSU/APatch 模块
 
 [![Release](https://img.shields.io/github/v/release/Alien-Et/OpenList-Magisk)](https://github.com/Alien-Et/OpenList-Magisk/releases)
 [![License](https://img.shields.io/github/license/Alien-Et/OpenList-Magisk)](https://github.com/Alien-Et/OpenList-Magisk/blob/main/LICENSE)
 
-OpenList Magisk 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) 文件服务器集成到 Android 系统中，通过 Magisk 或 KernelSU 以系统化方式运行，支持 ARM 和 ARM64 架构。
+OpenList Magisk 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) 文件服务器集成到 Android 系统中，通过 Magisk、KernelSU 或 APatch 以系统化方式运行，支持 ARM 和 ARM64 架构。
 
 ## 功能亮点
 
-- **双框架支持**：同时兼容 Magisk 和 KernelSU
+- **多框架支持**：同时兼容 Magisk、KernelSU 和 APatch
 - **灵活安装选项**：支持三种安装位置
   - data/adb/openlist
   - 模块目录/bin
@@ -34,7 +34,7 @@ OpenList Magisk 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) �
 
 ## 框架兼容性
 
-本模块同时支持 **Magisk** 和 **KernelSU** 两大Android Root框架：
+本模块同时支持 **Magisk**、**KernelSU** 和 **APatch** 三大 Android Root 框架：
 
 ### Magisk 支持
 - 支持 Magisk v20.4 及以上版本
@@ -48,8 +48,14 @@ OpenList Magisk 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) �
 - 支持 KernelSU 动作按钮控制
 - 支持 KernelSU 更新机制
 
+### APatch 支持
+- 支持 APatch 最新版本
+- 完全兼容 APatch 模块系统
+- 支持 APatch 动作按钮控制
+- 支持 APatch 更新机制
+
 ### 通用特性
-- 自动检测运行环境（Magisk/KernelSU）
+- 自动检测运行环境（Magisk/KernelSU/APatch）
 - 统一的路径配置和处理
 - 兼容的卸载机制
 - 完整的日志记录系统
@@ -60,7 +66,7 @@ OpenList Magisk 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) �
    - 从 [GitHub Releases](https://github.com/Alien-Et/OpenList-Magisk/releases) 下载最新版本
 
 2. **安装配置**
-   - 打开 Magisk 管理器 或 KernelSU 管理器
+   - 打开 Magisk 管理器、KernelSU 管理器 或 APatch 管理器
    - 选择"从本地安装"
    - 进入安装配置界面：
      - 选择二进制文件安装位置
@@ -75,7 +81,7 @@ OpenList Magisk 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) �
 
 ### 服务管理
 - 系统启动后自动运行
-- 通过 Magisk/KernelSU "动作"按钮控制服务
+- 通过 Magisk/KernelSU/APatch "动作"按钮控制服务
 - 服务状态显示在 module.prop：
   - 运行中：显示访问地址和数据目录
   - 已停止：显示启动提示
@@ -114,7 +120,7 @@ OpenList Magisk 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) �
 - 查看日志：`cat /data/adb/modules/openlist/service.log`
 
 ## 更新说明
-- 支持通过 Magisk/KernelSU 更新检查
+- 支持通过 Magisk/KernelSU/APatch 更新检查
 - 更新不会清除现有数据
 - 可在安装时重新选择配置选项
 

@@ -1,9 +1,11 @@
 # shellcheck shell=ash
 
-#==== 侦探：Magisk or KernelSU ====
+#==== 侦探：Magisk or KernelSU or APatch ====
 if [ -n "$MAGISK_VER" ]; then
     MODROOT="$MODPATH"
 elif [ -n "$KSU" ] || [ -n "$KERNELSU" ]; then
+    MODROOT="$MODULEROOT"
+elif [ -n "$APATCH" ]; then
     MODROOT="$MODULEROOT"
 else
     MODROOT="$MODPATH"  # 兜底，保持旧逻辑

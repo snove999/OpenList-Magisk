@@ -1,9 +1,9 @@
-# OpenList Magisk/KernelSU 模块
+# OpenList Magisk/KernelSU/APatch 模块
 
 [![Release](https://img.shields.io/github/v/release/Alien-Et/OpenList-Magisk)](https://github.com/Alien-Et/OpenList-Magisk/releases)
 [![License](https://img.shields.io/github/license/Alien-Et/OpenList-Magisk)](https://github.com/Alien-Et/OpenList-Magisk/blob/main/LICENSE)
 
-OpenList 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) 文件服务器集成到 Android 系统中，通过 Magisk 或 KernelSU 以系统化方式运行，支持 ARM 和 ARM64 架构。
+OpenList 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) 文件服务器集成到 Android 系统中，通过 Magisk、KernelSU 或 APatch 以系统化方式运行，支持 ARM 和 ARM64 架构。
 
 ## 功能亮点
 
@@ -15,14 +15,14 @@ OpenList 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) 文件�
   - /data/adb/openlist/
   - /storage/emulated/0/Android/openlist/
 - **密码定制**：提供初始密码设置选项
-- **动态服务管理**：通过 Magisk 的"动作"按钮一键控制服务
+- **动态服务管理**：通过 Magisk/KernelSU/APatch 的"动作"按钮一键控制服务
 - **智能网络适配**：自动识别 WiFi 和移动网络 IP
 - **日志支持**：详细的运行日志记录
 
 ## 系统要求
 
 - Android 设备（支持 ARM 或 ARM64 架构）
-- Magisk v20.4 或更高版本
+- Magisk v20.4 或更高版本，或 KernelSU，或 APatch
 - Root 权限
 
 ## 安装步骤
@@ -31,7 +31,7 @@ OpenList 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) 文件�
    - 从 [GitHub Releases](https://github.com/Alien-Et/OpenList-Magisk/releases) 下载最新版本
 
 2. **安装配置**
-   - 打开 Magisk 管理器
+   - 打开 Magisk 管理器、KernelSU 管理器 或 APatch 管理器
    - 选择"从本地安装"
    - 进入安装配置界面：
      - 选择二进制文件安装位置
@@ -46,7 +46,7 @@ OpenList 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) 文件�
 
 ### 服务管理
 - 系统启动后自动运行
-- 通过 Magisk "动作"按钮控制服务
+- 通过 Magisk/KernelSU/APatch "动作"按钮控制服务
 - 服务状态显示在 module.prop：
   - 运行中：显示访问地址和数据目录
   - 已停止：显示启动提示
@@ -85,7 +85,7 @@ OpenList 模块将 [OpenList](https://github.com/OpenListTeam/OpenList) 文件�
 - 查看日志：`cat /data/adb/modules/openlist/service.log`
 
 ## 更新说明
-- 支持通过 Magisk 更新检查
+- 支持通过 Magisk/KernelSU/APatch 更新检查
 - 更新不会清除现有数据
 - 可在安装时重新选择配置选项
 

@@ -12,11 +12,12 @@ TEMP_PORT_FILE="$MODDIR/port_result.tmp"
 
 # 查找可用的busybox路径，兼容Magisk和KSU
 toast_find_busybox() {
-    # 检查多个可能的busybox路径，按优先级排序
     if [ -x "/data/adb/magisk/busybox" ]; then
         echo "/data/adb/magisk/busybox"
     elif [ -x "/data/adb/ksu/bin/busybox" ]; then
         echo "/data/adb/ksu/bin/busybox"
+    elif [ -x "/data/adb/ap/bin/busybox" ]; then
+        echo "/data/adb/ap/bin/busybox"
     elif command -v busybox >/dev/null; then
         echo "$(command -v busybox)"
     else

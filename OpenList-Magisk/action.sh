@@ -9,8 +9,7 @@ REPO_URL="https://github.com/Alien-Et/OpenList-Magisk"
 
 # 修复：用字符串替代数组，适配 Ash Shell（不支持数组）
 find_busybox() {
-    # 用空格分隔路径字符串，后续用for循环遍历
-    local busybox_paths="/data/adb/magisk/busybox /data/adb/ksu/bin/busybox /data/adb/bin/busybox /system/xbin/busybox /system/bin/busybox"
+    local busybox_paths="/data/adb/magisk/busybox /data/adb/ksu/bin/busybox /data/adb/ap/bin/busybox /data/adb/bin/busybox /system/xbin/busybox /system/bin/busybox"
     
     for path in $busybox_paths; do
         if [ -x "$path" ]; then
@@ -19,7 +18,6 @@ find_busybox() {
         fi
     done
 
-    # Fallback：通过which查找
     local which_busybox
     which_busybox=$(which busybox 2>/dev/null)
     if [ -x "$which_busybox" ]; then
@@ -27,7 +25,6 @@ find_busybox() {
         return 0
     fi
 
-    # 未找到BusyBox，报错退出
     echo "错误:找不到BusyBox！" >&2
     exit 1
 }
