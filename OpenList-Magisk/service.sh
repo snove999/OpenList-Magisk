@@ -224,10 +224,6 @@ if ! command -v ip >/dev/null; then
     exit 1
 fi
 
-if [ "$OPENLIST_BINARY" = "__PLACEHOLDER_BINARY_PATH__" ]; then
-    log "错误: OPENLIST_BINARY 未在安装时配置"
-    exit 1
-fi
 if [ ! -f "$OPENLIST_BINARY" ]; then
     log "错误: $OPENLIST_BINARY 不存在"
     exit 1
@@ -238,11 +234,6 @@ if [ ! -x "$OPENLIST_BINARY" ]; then
         log "错误: 无法设置 $OPENLIST_BINARY 的执行权限"
         exit 1
     }
-fi
-
-if [ "$DATA_DIR" = "__PLACEHOLDER_DATA_DIR__" ]; then
-    log "错误: DATA_DIR 未在安装时配置"
-    exit 1
 fi
 
 mkdir -p "$DATA_DIR" 2>/dev/null
