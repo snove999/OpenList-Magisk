@@ -136,6 +136,11 @@ update_module_prop_running() {
     if [ -z "$pid" ]; then
         log "错误: 未找到运行中的 openlist"
         NEW_DESC="description=【未运行】无法找到 openlist 进程，请检查日志 $LOG_FILE"
+        # 直接更新 module.prop 并返回
+        grep -v '^description=' "$MODULE_PROP_FILE" > "${MODULE_PROP_FILE}.tmp" 2>/dev/null
+        echo "$NEW_DESC" >> "${MODULE_PROP_FILE}.tmp"
+        mv "${MODULE_PROP_FILE}.tmp" "$MODULE_PROP_FILE" 2>/dev/null
+        return 1
     else
         log "找到 Openlist PID: $pid"
         get_port "$pid" &
