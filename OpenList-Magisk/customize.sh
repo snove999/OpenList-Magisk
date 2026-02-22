@@ -133,15 +133,15 @@ INSTALL_OPTION=$?
 case $INSTALL_OPTION in
     1) 
         BINARY_PATH="/data/adb/openlist/bin"
-        BINARY_SERVICE_PATH="/data/adb/openlist/bin/openlist"  # 绝对路径
+        BINARY_SERVICE_PATH="/data/adb/openlist/bin/openlist"
         ;;
     2) 
         BINARY_PATH="$MODROOT/bin"
-        BINARY_SERVICE_PATH="\$MODDIR/bin/openlist"  # 使用 MODDIR 变量
+        BINARY_SERVICE_PATH='$MODDIR/bin/openlist'
         ;;
     3) 
         BINARY_PATH="$MODROOT/system/bin"
-        BINARY_SERVICE_PATH="\$MODDIR/system/bin/openlist"  # 使用 MODDIR 变量
+        BINARY_SERVICE_PATH='$MODDIR/system/bin/openlist'
         ;;
 esac
 
@@ -193,10 +193,10 @@ ui_print "━━━━━━━━━━━━━━━━━━━━━━"
 
 # 更新 service.sh - 使用占位符替换
 if [ -f "$MODROOT/service.sh" ] && [ -f "$MODROOT/action.sh" ]; then
-    # 替换占位符为实际路径
-    sed -i "s|__PLACEHOLDER_BINARY_PATH__|$BINARY_SERVICE_PATH|g" "$MODROOT/service.sh"
-    sed -i "s|__PLACEHOLDER_BINARY_PATH__|$BINARY_SERVICE_PATH|g" "$MODROOT/action.sh"
-    sed -i "s|__PLACEHOLDER_DATA_DIR__|$DATA_DIR|g" "$MODROOT/service.sh"
+    # 替换占位符为实际路径（使用单引号防止 $MODDIR 被展开）
+    sed -i 's|__PLACEHOLDER_BINARY_PATH__|'"$BINARY_SERVICE_PATH"'|g' "$MODROOT/service.sh"
+    sed -i 's|__PLACEHOLDER_BINARY_PATH__|'"$BINARY_SERVICE_PATH"'|g' "$MODROOT/action.sh"
+    sed -i 's|__PLACEHOLDER_DATA_DIR__|'"$DATA_DIR"'|g' "$MODROOT/service.sh"
 
     # 验证更新是否成功 - 检查占位符是否被正确替换
     if ! grep -q "__PLACEHOLDER_BINARY_PATH__" "$MODROOT/service.sh" && \
