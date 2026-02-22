@@ -192,12 +192,12 @@ ui_print "3. 迁移后更新 config.json 中的路径"
 ui_print "━━━━━━━━━━━━━━━━━━━━━━"
 
 # 更新 service.sh - 使用占位符替换
-    if [ -f "$MODROOT/service.sh" ] && [ -f "$MODROOT/action.sh" ]; then
-        # 替换占位符为实际路径
-        sed -i "s|__PLACEHOLDER_BINARY_PATH__|$BINARY_SERVICE_PATH|g" "$MODROOT/service.sh"
-        sed -i "s|__PLACEHOLDER_BINARY_PATH__|$BINARY_SERVICE_PATH|g" "$MODROOT/action.sh"
-        sed -i "s|__PLACEHOLDER_DATA_DIR__|$DATA_DIR|g" "$MODROOT/service.sh"
-    
+if [ -f "$MODROOT/service.sh" ] && [ -f "$MODROOT/action.sh" ]; then
+    # 替换占位符为实际路径
+    sed -i "s|__PLACEHOLDER_BINARY_PATH__|$BINARY_SERVICE_PATH|g" "$MODROOT/service.sh"
+    sed -i "s|__PLACEHOLDER_BINARY_PATH__|$BINARY_SERVICE_PATH|g" "$MODROOT/action.sh"
+    sed -i "s|__PLACEHOLDER_DATA_DIR__|$DATA_DIR|g" "$MODROOT/service.sh"
+
     # 验证更新是否成功 - 检查占位符是否被正确替换
     if ! grep -q "__PLACEHOLDER_BINARY_PATH__" "$MODROOT/service.sh" && \
        ! grep -q "__PLACEHOLDER_BINARY_PATH__" "$MODROOT/action.sh" && \
