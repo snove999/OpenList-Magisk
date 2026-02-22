@@ -7,6 +7,11 @@ SERVICE_SH="$MODDIR/service.sh"
 OPENLIST_BINARY="__PLACEHOLDER_BINARY_PATH__"
 REPO_URL="https://github.com/Alien-Et/OpenList-Magisk"
 
+if [ "$OPENLIST_BINARY" = "__PLACEHOLDER_BINARY_PATH__" ]; then
+    echo "错误: OPENLIST_BINARY 未在安装时配置"
+    exit 1
+fi
+
 # 修复：用字符串替代数组，适配 Ash Shell（不支持数组）
 find_busybox() {
     local busybox_paths="/data/adb/magisk/busybox /data/adb/ksu/bin/busybox /data/adb/ap/bin/busybox /data/adb/bin/busybox /system/xbin/busybox /system/bin/busybox"
@@ -49,7 +54,7 @@ update_module_prop_stopped() {
 # 主逻辑：启停服务
 if check_openlist_status; then
     # 服务已运行：执行停止
-    "$BUSYBOX" pkill -f openlist
+    "$BUSYBOX" pkill -f "$OPENLIST_BINARY"
     sleep 1  # 等待进程终止
     if check_openlist_status; then
         echo "无法停止 OpenList 服务"

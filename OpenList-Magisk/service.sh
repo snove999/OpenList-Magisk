@@ -219,7 +219,7 @@ if ! command -v ip >/dev/null; then
     exit 1
 fi
 
-if [ "$OPENLIST_BINARY" = "TO_BE_REPLACED" ]; then
+if [ "$OPENLIST_BINARY" = "__PLACEHOLDER_BINARY_PATH__" ]; then
     log "错误: OPENLIST_BINARY 未在安装时配置"
     exit 1
 fi
@@ -235,7 +235,7 @@ if [ ! -x "$OPENLIST_BINARY" ]; then
     }
 fi
 
-if [ "$DATA_DIR" = "TO_BE_REPLACED" ]; then
+if [ "$DATA_DIR" = "__PLACEHOLDER_DATA_DIR__" ]; then
     log "错误: DATA_DIR 未在安装时配置"
     exit 1
 fi
