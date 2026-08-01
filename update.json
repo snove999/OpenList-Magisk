@@ -6,9 +6,9 @@
   "aria2_version": "1.36.0_2021.08.22",
   "qbit_version": "release-5.2.3_v2.0.13",
   "frpc_version": "v0.70.1",
-  "rclone_version": "v1.74.4",
+  "rclone_version": "v1.75.0",
   "ariang_version": "1.3.14",
   "vuetorrent_version": "v2.34.1",
-  "build_date": "2026-07-25T18:58:56Z",
-  "build_reason": "OpenList 更新: v4.2.3 → v4.2.4"
+  "build_date": "2026-08-01T19:00:14Z",
+  "build_reason": "Rclone 更新: v1.74.4 → v1.75.0"
 }
